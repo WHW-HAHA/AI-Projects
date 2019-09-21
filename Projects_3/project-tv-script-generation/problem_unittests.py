@@ -159,6 +159,7 @@ def test_rnn(RNN, train_on_gpu):
         b = b.cuda()
     
     output, hidden_out = rnn(b, hidden)
+    print('ok,up to here')
     
     assert_test = AssertTest({
                              'Input Size': vocab_size,
