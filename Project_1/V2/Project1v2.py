@@ -1,14 +1,15 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # # 你的第一个神经网络
 # 
 # 在此项目中，你将构建你的第一个神经网络，并用该网络预测每日自行车租客人数。我们提供了一些代码，但是需要你来实现神经网络（大部分内容）。提交此项目后，欢迎进一步探索该数据和模型。
 
-# In[24]:
+# In[1]:
 
-get_ipython().magic('matplotlib inline')
-get_ipython().magic("config InlineBackend.figure_format = 'retina'")
+
+get_ipython().run_line_magic('matplotlib', 'inline')
+get_ipython().run_line_magic('config', "InlineBackend.figure_format = 'retina'")
 
 import numpy as np
 import pandas as pd
@@ -22,14 +23,16 @@ import time
 # 
 # 构建神经网络的关键一步是正确地准备数据。不同尺度级别的变量使网络难以高效地掌握正确的权重。我们在下方已经提供了加载和准备数据的代码。你很快将进一步学习这些代码！
 
-# In[25]:
+# In[2]:
+
 
 data_path = 'Bike-Sharing-Dataset/hour.csv'
 
 rides = pd.read_csv(data_path)
 
 
-# In[26]:
+# In[3]:
+
 
 rides.head()
 
@@ -40,7 +43,8 @@ rides.head()
 # 
 # 下图展示的是数据集中前 10 天左右的骑车人数（某些天不一定是 24 个条目，所以不是精确的 10 天）。你可以在这里看到每小时租金。这些数据很复杂！周末的骑行人数少些，工作日上下班期间是骑行高峰期。我们还可以从上方的数据中看到温度、湿度和风速信息，所有这些信息都会影响骑行人数。你需要用你的模型展示所有这些数据。
 
-# In[27]:
+# In[4]:
+
 
 rides[:24*10].plot(x='dteday', y='cnt')
 type(rides)
@@ -50,7 +54,8 @@ type(rides)
 # 
 # 下面是一些分类变量，例如季节、天气、月份。要在我们的模型中包含这些数据，我们需要创建二进制虚拟变量。用 Pandas 库中的 `get_dummies()` 就可以轻松实现。
 
-# In[28]:
+# In[5]:
+
 
 dummy_fields = ['season', 'weathersit', 'mnth', 'hr', 'weekday']
 for each in dummy_fields:
@@ -69,7 +74,8 @@ data.head()
 # 
 # 我们会保存换算因子，以便当我们使用网络进行预测时可以还原数据。
 
-# In[29]:
+# In[6]:
+
 
 quant_features = ['casual', 'registered', 'cnt', 'temp', 'hum', 'windspeed']
 # Store scalings in a dictionary so we can convert back later
@@ -85,7 +91,8 @@ for each in quant_features:
 # 
 # 我们将大约最后 21 天的数据保存为测试数据集，这些数据集会在训练完网络后使用。我们将使用该数据集进行预测，并与实际的骑行人数进行对比。
 
-# In[30]:
+# In[7]:
+
 
 # Save data for approximately the last 21 days 
 test_data = data[-21*24:]
@@ -101,7 +108,8 @@ test_features, test_targets = test_data.drop(target_fields, axis=1), test_data[t
 
 # 我们将数据拆分为两个数据集，一个用作训练，一个在网络训练完后用来验证网络。因为数据是有时间序列特性的，所以我们用历史数据进行训练，然后尝试预测未来数据（验证数据集）。
 
-# In[31]:
+# In[8]:
+
 
 # Hold out the last 60 days or so of the remaining data as a validation set
 train_features, train_targets = features[:-60*24], targets[:-60*24]
@@ -132,7 +140,8 @@ print(val_features.shape)
 # 
 #   
 
-# In[32]:
+# In[9]:
+
 
 class NeuralNetwork():
     def __init__(self, input_nodes, hidden_nodes, output_nodes, learning_rate):
@@ -142,18 +151,14 @@ class NeuralNetwork():
         self.output_nodes = output_nodes
 
         self.weights_input_to_hidden = np.random.normal(0, self.input_nodes**-0.5,
-                                                        (self.input_nodes, self.hidden_nodes))
+                                                       (self.input_nodes, self.hidden_nodes))
         self.weights_hidden_to_output = np.random.normal(0, self.hidden_nodes**-0.5,
-                                                         (self.hidden_nodes, self.output_nodes))
+                                                        (self.hidden_nodes, self.output_nodes))
         self.lr = learning_rate
         self.activation_function = lambda x: 1/(1+np.exp(-x))
 #         print('Initime1',time.time()-ct)
 
     def train(self, features, targets):
-#         ct = time.time()
-        features = np.array(features, ndmin= 3)
-        targets = np.array(targets, ndmin= 3)
-
         n_records = features.shape[0]
         delta_weights_i_h = np.zeros(self.weights_input_to_hidden.shape)
         delta_weights_h_o = np.zeros(self.weights_hidden_to_output.shape)
@@ -167,12 +172,12 @@ class NeuralNetwork():
             self.error = y - final_outputs
             error_term = self.error
 
-            hidden_error = np.dot(self.weights_hidden_to_output, error_term) # shape should be hidden_nodes x 1 --> 16 x 1 or 2 x 1
-            hidden_error_term = hidden_error * hidden_outputs.T * (1-hidden_outputs).T # 2 x 1
+            hidden_error = np.dot(error_term, self.weights_hidden_to_output.T) # shape should be hidden_nodes x 1 --> 16 x 1 or 2 x 1
+            hidden_error_term = hidden_error * hidden_outputs * (1-hidden_outputs) # 2 x 1
 
-            delta_weights_h_o += error_term * hidden_outputs.T  # shape should like self.w_h_o --> 1 x 2 or 1 x 16
+            delta_weights_h_o += error_term * hidden_outputs[:,None]# shape should like self.w_h_o --> 1 x 2 or 1 x 16
             # delta_weights_i_h += hidden_error_term * X        # shape should like self.w_i_h --> 2 x 3 or 16 x 56
-            delta_weights_i_h += X.T * hidden_error_term.T
+            delta_weights_i_h +=  hidden_error_term * X[:,None]
 
         self.weights_hidden_to_output += self.lr * delta_weights_h_o / n_records
         self.weights_input_to_hidden += self.lr * delta_weights_i_h / n_records
@@ -187,10 +192,11 @@ class NeuralNetwork():
         final_outputs = final_inputs
 #         print('Run time:', time.time()-c_time)
 
-        return final_outputs.T
+        return final_outputs
 
 
-# In[34]:
+# In[10]:
+
 
 def MSE(y, Y):
     return np.mean((y-Y)**2)
@@ -200,7 +206,8 @@ def MSE(y, Y):
 # 
 # 运行这些单元测试，检查你的网络实现是否正确。这样可以帮助你确保网络已正确实现，然后再开始训练网络。这些测试必须成功才能通过此项目。
 
-# In[35]:
+# In[11]:
+
 
 import unittest
 
@@ -282,47 +289,40 @@ unittest.TextTestRunner().run(suite)
 # 
 # 隐藏节点越多，模型的预测结果就越准确。尝试不同的隐藏节点的数量，看看对性能有何影响。你可以查看损失字典，寻找网络性能指标。如果隐藏单元的数量太少，那么模型就没有足够的空间进行学习，如果太多，则学习方向就有太多的选择。选择隐藏单元数量的技巧在于找到合适的平衡点。
 
-# In[36]:
+# In[12]:
+
 
 import sys
-# from NN import NeuralNetwork
-### TODO:Set the hyperparameters here, you need to change the defalut to get a better solution ###
-import time
-iterations = 1000
-learning_rate = 0.8
-hidden_nodes = 2
+
+### Set the hyperparameters here ###
+iterations = 5000
+learning_rate = 0.5
+hidden_nodes = 10
 output_nodes = 1
 
 N_i = train_features.shape[1]
 network = NeuralNetwork(N_i, hidden_nodes, output_nodes, learning_rate)
 
 losses = {'train':[], 'validation':[]}
-for e in range(iterations):
-    if (e > 500):
-        network.lr = 0.1
-    if (e> 800):
-        network.lr = 0.01
+for ii in range(iterations):
     # Go through a random batch of 128 records from the training data set
     batch = np.random.choice(train_features.index, size=128)
-    for record, target in zip(train_features.ix[batch].values, 
-                              train_targets.ix[batch]['cnt']):
-#         c_time= time.time()
-        network.train(record, target)
-#         print('train time: ', str(time.time()-c_time))
+    X, y = train_features.ix[batch].values, train_targets.ix[batch]['cnt']
+                             
+    network.train(X, y)
+    
     # Printing out the training progress
-    c_time = time.time()
-    train_loss = MSE(network.run(train_features), train_targets['cnt'].values)
-#     print('Train_loss_cal: ', time.time()-c_time)
-    c_time = time.time()
-    val_loss = MSE(network.run(val_features), val_targets['cnt'].values)
-#     print('Val_loss_cal: ', time.time()-c_time)
-    sys.stdout.write("\rProgress: " + str(100 * e/float(iterations))[:4]                     + "% ... Training loss: " + str(train_loss)[:5]                     + " ... Validation loss: " + str(val_loss)[:5]                     + "...other Time" + str(time.time()-c_time))
+    train_loss = MSE(network.run(train_features).T, train_targets['cnt'].values)
+    val_loss = MSE(network.run(val_features).T, val_targets['cnt'].values)
+    sys.stdout.write("\rProgress: {:2.1f}".format(100 * ii/float(iterations))                      + "% ... Training loss: " + str(train_loss)[:5]                      + " ... Validation loss: " + str(val_loss)[:5])
+    sys.stdout.flush()
     
     losses['train'].append(train_loss)
     losses['validation'].append(val_loss)
 
 
-# In[37]:
+# In[13]:
+
 
 plt.plot(losses['train'], label='Training loss')
 plt.plot(losses['validation'], label='Validation loss')
@@ -334,14 +334,15 @@ _ = plt.ylim()
 # 
 # 使用测试数据看看网络对数据建模的效果如何。如果完全错了，请确保网络中的每步都正确实现。
 
-# In[38]:
+# In[14]:
+
 
 fig, ax = plt.subplots(figsize=(8,4))
 
 mean, std = scaled_features['cnt']
 
 predictions = network.run(test_features)*std + mean
-ax.plot(predictions[0], label='Prediction')
+ax.plot(predictions, label='Prediction')
 ax.plot((test_targets['cnt']*std + mean).values, label='Data')
 ax.set_xlim(right=len(predictions))
 ax.legend()
