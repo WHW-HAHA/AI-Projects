@@ -2,10 +2,10 @@
 
 This repository showcases a few completed Deep Learning projects in Udacity Deep Learning program. 
 Each project focuses on a specific neural network or an algorithm. 
-* Project 1: A typical 2-layers Neural Network
-* Project 2: A Convolutional Neural Network to classify the dog breeds
-* Project 3: A Recurrent Neural Network to generate random TV scripts
-* Project 4: A Generative Adversarial Network to human faces
+* Project 1: A typical Neural Network
+* Project 2: A Convolutional Neural Network 
+* Project 3: A Recurrent Neural Network 
+* Project 4: A Generative Adversarial Network
 
 All the Neural networks were trained and verified with the data provided by Udacity.
 
@@ -26,12 +26,12 @@ In this project, I built a convolutional neural net work to read the user-suppli
 
 *Without dog*
 ## Project 3: TV Scripts generation 
-In this project, I generated my own Simpson TV scripts by using Recurrent Neural Networks. 
+In this project, I generated my own Simpson TV scripts by using Recurrent Neural Network. 
 The training data set was from the scripts of Simpson season 27. 
 The RNNs eventually generated a new ,"fake" TV script, based on patterns it recognizes in this training data.
 
 ## Project 4: Generate fake hand writing numbers and fake faces 
-In this project, I created fake hand writing numbers and fake faces by using Generative Adversarial Networks
+In this project, I created fake hand writing numbers and fake faces by using Generative Adversarial Network
 
 The fake hand writing numbers in of thd first epoch and the eighth epoch
 
