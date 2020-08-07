@@ -2,10 +2,11 @@
 
 This repository showcases a few completed Deep Learning projects in Udacity Deep Learning program. 
 Each project focuses on a specific neural network. 
-* Project 1: A typical Neural Network
-* Project 2: A Convolutional Neural Network 
-* Project 3: A Recurrent Neural Network 
-* Project 4: A Generative Adversarial Network
+* Project 1: A typical Neural Network to predict the bike rental ridership
+* Project 2: A Convolutional Neural Network to classify the dog breeds
+* Project 3: A Recurrent Neural Network to create a fake TV scripts
+* Project 4: A Generative Adversarial Network to create the fake hand writing numbers and fake faces
+* Project 5: A typical Neural Network to classify the film reviews by their sentiments
 
 All the Neural Networks were trained and verified with the data provided by Udacity.
 
@@ -40,3 +41,6 @@ The fake hand writing numbers of thd first epoch and the eighth epoch
 The fake faces of the first epoch and fourth epoch 
 
 ![fakefaces epoc1](https://user-images.githubusercontent.com/43483189/89531639-d8f0bd00-d7f0-11ea-9ac5-d7b2dee5054e.png)![fakefaces epoc4](https://user-images.githubusercontent.com/43483189/89532763-962fe480-d7f2-11ea-8003-3ad9065160dd.png)
+
+### Project 5: Sentimental classification of film reviews
+In this project, I built a Neural Network to classify the film reviews to positive and negative according to the sentiment in the reviews.
