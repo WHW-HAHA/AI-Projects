@@ -1,4 +1,4 @@
-# A series of completed deep learning projects in Udacity deep learning 
+# A series of completed deep learning projects in Udacity deep learning program
 
 This repository showcases a few completed Deep Learning projects in Udacity Deep Learning program. 
 Each project focuses on a specific neural network. 
